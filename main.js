@@ -78,7 +78,8 @@ function init(data, world) {
   // size repeats the warming so changes over time are easy to see
   const radius = d3.scaleSqrt().domain([0, maxW]).range([3, 17]).clamp(true);
 
-  const yearLabel = mapSvg.append("text").attr("class", "map-year").attr("x", 24).attr("y", MH - 24);
+  const yearLabel = mapSvg.append("text").attr("class", "map-year").attr("x", 24).attr("y", MH - 40);
+  const sourceLabel = mapSvg.append("text").attr("class", "map-source").attr("x", 26).attr("y", MH - 20);
   const dotsG = mapSvg.append("g");
   const labelsG = mapSvg.append("g");
   const dots = dotsG.selectAll("circle").data(realCities, (d) => d.name).join("circle")
@@ -103,7 +104,7 @@ function init(data, world) {
     .text((d) => d.name);
 
   // legend
-  const legendSvg = d3.select("#legend").append("svg").attr("viewBox", [0, 0, 380, 44]);
+  const legendSvg = d3.select("#legend").append("svg").attr("viewBox", [0, 0, 380, 52]);
   (function drawLegend() {
     const x = d3.scaleLinear().domain(color.domain()).range([16, 360]);
     const grad = legendSvg.append("defs").append("linearGradient").attr("id", "lg");
@@ -112,7 +113,7 @@ function init(data, world) {
     legendSvg.append("g").attr("class", "axis").attr("transform", "translate(0,15)")
       .call(d3.axisBottom(x).ticks(5).tickSize(3).tickFormat((v) => "+" + v + "°C"))
       .call((g) => g.select(".domain").remove());
-    legendSvg.append("text").attr("class", "lbl").attr("x", 16).attr("y", 38).text("Darker and bigger dots = more warming");
+    legendSvg.append("text").attr("class", "lbl").attr("x", 16).attr("y", 48).text("Darker and bigger dots = more warming");
   })();
 
   // ================= RANKING =================
@@ -156,6 +157,11 @@ function init(data, world) {
     labels.transition().duration(250)
       .attr("x", (d) => projection([d.lon, d.lat])[0] + radius(warming(d, state.scen, state.year)) + 4);
     yearLabel.text(state.year);
+    const scenName = state.scen === "ssp245" ? "middle-road scenario (SSP2-4.5)" : "high-emissions scenario (SSP5-8.5)";
+    sourceLabel.classed("future", state.year > 2026)
+      .text(state.year > 2026
+        ? `PROJECTION · average of 5 CMIP6 climate models · ${scenName}`
+        : "Simulated by 5 CMIP6 climate models (historical runs)");
     dots.classed("sel", (d) => d.name === state.city);
     labels.classed("sel", (d) => d.name === state.city)
       .style("display", (d) => (d.name === SD || d.name === state.city ? null : "none"));
