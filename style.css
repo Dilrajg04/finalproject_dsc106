@@ -63,7 +63,9 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 2px s
 .chart svg { display: block; width: 100%; height: auto; overflow: visible; }
 .land { fill: var(--land); stroke: var(--land-edge); stroke-width: .5; }
 .sphere { fill: none; stroke: var(--rule); }
-.city-dot { stroke: var(--panel); stroke-width: 1.5; cursor: pointer; }
+.city-dot { stroke: var(--panel); stroke-width: 1.5; cursor: pointer; fill-opacity: .92; }
+.map-year { font-family: Fraunces, Georgia, serif; font-size: 44px; fill: var(--ink-3); opacity: .55; pointer-events: none; }
+.icon-btn { font: inherit; font-size: 13px; width: 34px; padding: 6px 0; cursor: pointer; border: 1px solid var(--rule); background: var(--panel); color: var(--ink); border-radius: 8px; }
 .city-dot.sd { stroke: var(--sd); stroke-width: 3; }
 .city-dot.sel { stroke: var(--city); stroke-width: 3; }
 .city-label { font-size: 11px; fill: var(--ink-2); pointer-events: none; paint-order: stroke; stroke: var(--bg); stroke-width: 3px; }

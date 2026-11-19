@@ -72,13 +72,17 @@ function init(data, world) {
 
   const allW = [];
   for (const c of realCities) for (const s of ["ssp245", "ssp585"]) allW.push(warming(c, s, 2100));
-  const color = d3.scaleSequential(d3.interpolateOrRd).domain([0, Math.max(2, d3.max(allW))]).clamp(true);
+  const maxW = Math.ceil(Math.max(2, d3.max(allW)));
+  // start the ramp at a visible orange so cool years aren't white-on-white
+  const color = d3.scaleSequential((t) => d3.interpolateOrRd(0.18 + 0.82 * t)).domain([0, maxW]).clamp(true);
+  // size repeats the warming so changes over time are easy to see
+  const radius = d3.scaleSqrt().domain([0, maxW]).range([3, 17]).clamp(true);
 
+  const yearLabel = mapSvg.append("text").attr("class", "map-year").attr("x", 24).attr("y", MH - 24);
   const dotsG = mapSvg.append("g");
   const labelsG = mapSvg.append("g");
   const dots = dotsG.selectAll("circle").data(realCities, (d) => d.name).join("circle")
     .attr("class", (d) => "city-dot" + (d.name === SD ? " sd" : ""))
-    .attr("r", (d) => (d.name === SD ? 8 : 7))
     .attr("cx", (d) => projection([d.lon, d.lat])[0])
     .attr("cy", (d) => projection([d.lon, d.lat])[1])
     .on("pointermove", (event, d) => {
@@ -99,7 +103,7 @@ function init(data, world) {
     .text((d) => d.name);
 
   // legend
-  const legendSvg = d3.select("#legend").append("svg").attr("viewBox", [0, 0, 380, 40]);
+  const legendSvg = d3.select("#legend").append("svg").attr("viewBox", [0, 0, 380, 44]);
   (function drawLegend() {
     const x = d3.scaleLinear().domain(color.domain()).range([16, 360]);
     const grad = legendSvg.append("defs").append("linearGradient").attr("id", "lg");
@@ -108,6 +112,7 @@ function init(data, world) {
     legendSvg.append("g").attr("class", "axis").attr("transform", "translate(0,15)")
       .call(d3.axisBottom(x).ticks(5).tickSize(3).tickFormat((v) => "+" + v + "°C"))
       .call((g) => g.select(".domain").remove());
+    legendSvg.append("text").attr("class", "lbl").attr("x", 16).attr("y", 38).text("Darker and bigger dots = more warming");
   })();
 
   // ================= RANKING =================
@@ -144,7 +149,13 @@ function init(data, world) {
   }
 
   function updateMap() {
-    dots.transition().duration(300).attr("fill", (d) => color(warming(d, state.scen, state.year)));
+    dots.sort((a, b) => warming(b, state.scen, state.year) - warming(a, state.scen, state.year))  // small dots on top
+      .transition().duration(250)
+      .attr("fill", (d) => color(warming(d, state.scen, state.year)))
+      .attr("r", (d) => radius(warming(d, state.scen, state.year)));
+    labels.transition().duration(250)
+      .attr("x", (d) => projection([d.lon, d.lat])[0] + radius(warming(d, state.scen, state.year)) + 4);
+    yearLabel.text(state.year);
     dots.classed("sel", (d) => d.name === state.city);
     labels.classed("sel", (d) => d.name === state.city)
       .style("display", (d) => (d.name === SD || d.name === state.city ? null : "none"));
@@ -260,7 +271,20 @@ function init(data, world) {
     d3.selectAll(".seg button").attr("aria-checked", function () { return this.dataset.scen === state.scen; });
     updateHook(); updateMap(); drawLines();
   });
-  d3.select("#year").on("input", function () { state.year = +this.value; updateMap(); });
+  let timer = null;
+  const stop = () => { if (timer) { timer.stop(); timer = null; } d3.select("#play").html("&#9654;").attr("aria-label", "Play"); };
+  d3.select("#year").on("input", function () { stop(); state.year = +this.value; updateMap(); });
+  d3.select("#play").on("click", () => {
+    if (timer) return stop();
+    if (state.year >= 2100) state.year = 1950;
+    d3.select("#play").html("&#10074;&#10074;").attr("aria-label", "Pause");
+    timer = d3.interval(() => {
+      state.year = Math.min(2100, state.year + 2);
+      d3.select("#year").property("value", state.year);
+      updateMap();
+      if (state.year >= 2100) stop();
+    }, 120);
+  });
 
   updateHook();
   updateMap();
