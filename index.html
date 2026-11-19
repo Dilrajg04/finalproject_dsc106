@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>San Diego vs The World</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/topojson-client@3.1.0/dist/topojson-client.min.js"></script>
+</head>
+<body>
+<header class="wrap hero">
+  <h1>San Diego Temperature vs The World</h1>
+  <p class="byline">Kyle Shiroma, Yue Hu, Dilraj Grewal, and Roberto Echeverria Sosa &middot; DSC 106 Final Project (prototype)</p>
+  <p class="hook" id="hook">Climate change is warming every city on Earth. But is your city warming as fast as everyone else's?</p>
+</header>
+
+<main class="wrap">
+  <!-- 1. MAP -->
+  <section class="block">
+    <div class="section-head">
+      <h2 id="map-title">How much warmer each city gets</h2>
+      <p class="sub" id="map-sub">Average warming over the 20 years ending in the selected year, compared with 1850&ndash;1900. Hover a city for details; click one to compare it with San Diego.</p>
+    </div>
+    <div class="controls">
+      <div class="ctrl">
+        <span class="ctrl-label">Future</span>
+        <div class="seg" role="radiogroup" aria-label="Emissions scenario">
+          <button role="radio" aria-checked="true" data-scen="ssp245">Middle road (SSP2-4.5)</button>
+          <button role="radio" aria-checked="false" data-scen="ssp585">High emissions (SSP5-8.5)</button>
+        </div>
+      </div>
+      <div class="ctrl grow">
+        <span class="ctrl-label">Year</span>
+        <input id="year" type="range" min="1900" max="2100" step="1" value="2100" aria-label="Year">
+        <output id="year-out">2100</output>
+      </div>
+    </div>
+    <div class="map-row">
+      <div id="map" class="chart"></div>
+      <aside class="rank-col">
+        <h3>All cities, ranked</h3>
+        <div id="rank" class="chart"></div>
+      </aside>
+    </div>
+    <div id="legend"></div>
+  </section>
+
+  <!-- 2. GUESS -->
+  <section class="block guess" id="guess">
+    <div class="section-head">
+      <h2>Your turn: guess before you look</h2>
+      <p class="sub">Pick a city, then guess how much more (or less) it will warm than San Diego by 2081&ndash;2100.</p>
+    </div>
+    <div class="guess-controls">
+      <label class="ctrl"><span class="ctrl-label">City</span>
+        <select id="city-select" aria-label="Comparison city"></select>
+      </label>
+      <div class="ctrl grow">
+        <span class="ctrl-label">Your guess</span>
+        <input id="guess-input" type="range" min="-2" max="4" step="0.1" value="1" aria-label="Guessed difference in degrees Celsius">
+        <output id="guess-out">+1.0 &deg;C vs San Diego</output>
+      </div>
+      <button id="reveal" class="primary">Reveal</button>
+    </div>
+    <p class="result" id="result" aria-live="polite"></p>
+    <div id="lines" class="chart"></div>
+    <p class="sub" id="lines-sub">Lines show the 5-model average (10-year smoothing); shaded bands show the range across the 5 models.</p>
+  </section>
+
+  <p class="method" id="method"><strong>Data &amp; transformations.</strong> Near-surface air temperature (<code>tas</code>, monthly) from five CMIP6 climate models, read from the public CMIP6 archive on Google Cloud. For each city we take the model grid cell nearest to it (about 100&ndash;250 km wide, so coastal cities partly include ocean). Monthly values are averaged into yearly values, then each model is compared with its own 1850&ndash;1900 average, so differences between models' absolute temperatures cancel out. Historical runs cover 1850&ndash;2014; scenario runs cover 2015&ndash;2100. The map averages the 20 years ending in the selected year and the 5 models together.</p>
+
+  <!-- WRITE-UP: write these yourselves (at least 4 sentences each, per the rubric). -->
+  <article class="writeup">
+    <h2>Prototype write-up</h2>
+    <h3>What have we done so far?</h3>
+    <p class="todo">TODO (team): at least 4 sentences.</p>
+    <h3>What will be the most challenging part of our project to design, and why?</h3>
+    <p class="todo">TODO (team): at least 4 sentences.</p>
+  </article>
+</main>
+
+<div id="tooltip" role="tooltip" hidden></div>
+<script src="main.js"></script>
+</body>
+</html>
