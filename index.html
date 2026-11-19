@@ -78,9 +78,11 @@
   <article class="writeup">
     <h2>Prototype write-up</h2>
     <h3>What have we done so far?</h3>
-    <p class="todo">TODO (team): at least 4 sentences.</p>
+    <p>We decided on using the CMIP6 climate dataset to answer the question: “How does San Diego’s projected warming compare to major cities around the world?”. We then built a data pipeline that pulls monthly near-surface air temperatures from five climate models, (CESM2, GFDL-ESM4, MPI-ESM1-2-LR, UKESM1-0-LL and IPSL-CM6A-LR) respectively. We ran these models through 3 runs: the historical period from (1850 to 2014), the middle-road SSP2-4.5 and high emissions SSP5-8.5 (2015 to 2100). From these runs we extracted 24 major cities plus a global average and built a D3 page around visualizing them with a world map, a city ranking and an interactive guess to reveal a comparison chart. Additionally we added a timeline slider with a play button that animates rising temperatures across major cities worldwide from 1850 to 2100, alongside an animated cities ranked chart.
+</p>
     <h3>What will be the most challenging part of our project to design, and why?</h3>
-    <p class="todo">TODO (team): at least 4 sentences.</p>
+    <p>Our biggest challenge would be the model grid size. Each cell spans roughly 100-250km and our question is based upon cities which may be smaller in area. San Diego’s cell for example includes part of the Pacific, which warms much slower than land, and some of the city’s “low warning” may come from the ocean rather than the city itself. The models also disagree, with Lagos ranging from +1.5 to +4.0 C and UKESM1 and CESM2 models run hot enough to push the global average up to +3.1 C, making it difficult to visualize without confusing readers. While running through the models we also had to adjust our narrative: our proposal said San Diego would warm the least, but the data now ranks it 4th lowest, which the story has to follow the data and on the technical side, non standard model calendars broke our data run during testing until we installed cftime.
+</p>
   </article>
 </main>
 
